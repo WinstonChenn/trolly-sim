@@ -4,6 +4,13 @@ Winston Chen
 Utilities for trolly problem simulation enviorment setup
 """
 import random
+from enum import Enum
+import numpy as np
+
+
+class LossType(Enum):
+    TELE = "teleology"
+    DEON = "deontology"
 
 
 class Simulator:
@@ -84,6 +91,12 @@ class Simulator:
         else:
             return (trolly_idx-1, trolly_idx+1)
 
+    def get_trolly_str_by_idx(self, idx):
+        return str(self.trollies[idx])
+
+    def get_trolly_str_arr(self):
+        return [str(agent) for agent in self.trollies]
+
     def set_trolly_by_idx(self, idx, trolly_obj):
         trolly_obj.set_pass_num(self.trolly_pass_nums[idx])
         self.trollies[idx] = trolly_obj
@@ -92,6 +105,9 @@ class Simulator:
         assert len(trolly_arr) == self.n
         assert None not in trolly_arr
         self.trollies = trolly_arr
+
+    def shuffle_trolly_arr(self):
+        random.shuffle(self.trollies)
 
     def refresh_track_nums(self):
         """update the number of people on all the tracks """
@@ -104,7 +120,7 @@ class Simulator:
     def get_tot_tele_loss(self):
         return (self.total_pass_kill + self.total_track_kill) / (self.total_pass + self.total_track)
 
-    def get_tot_dele_loss(self):
+    def get_tot_deon_loss(self):
         return (self.total_pass_kill) / (self.total_pass)
 
     def get_tele_loss_by_idx(self, idx_arr):
@@ -118,7 +134,7 @@ class Simulator:
 
         return tot_kills/tot_ecounter
 
-    def get_dele_loss_by_idx(self, idx_arr):
+    def get_deon_loss_by_idx(self, idx_arr):
         tot_pass_kills = 0
         tot_pass_ecounter = 0
         for i in idx_arr:
@@ -126,6 +142,27 @@ class Simulator:
             tot_pass_ecounter += self.trolly_tot_dict[i]['pass']
 
         return tot_pass_kills/tot_pass_ecounter
+
+    def get_top_bot_n_trolly_idx(self, n, loss_type):
+        """
+        n: number of returned top idices\n
+        loss_type: currently either teleology loss or deontology loss\n
+        reverse: False - top n lowest loss; True - top n highest loss\n
+        """
+        if not isinstance(loss_type, LossType):
+            raise TypeError('loss type must be an instance of LossType')
+        assert n <= self.n
+        loss_arr = []
+        for i in range(len(self.trollies)):
+            if loss_type == LossType.TELE:
+                loss = self.get_tele_loss_by_idx([i])
+            elif loss_type == LossType.DEON:
+                loss = self.get_deon_loss_by_idx([i])
+            loss_arr.append(loss)
+        sort_idx = np.argsort(loss_arr)
+        top_n = sort_idx[:n]
+        bot_n = sort_idx[::-1][:n]
+        return top_n, bot_n
 
 
     def run_trial(self):
