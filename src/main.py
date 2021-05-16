@@ -201,7 +201,7 @@ def plot_agent_count(plot_url, title, count_dict, agent_label_arr):
     fig, axes = plt.subplots(2, 1, figsize=[18, 10])
     fig.tight_layout(rect=(0.01, 0.01, 1, 0.95))
     plt.subplots_adjust(hspace=0.2)
-    fig.suptitle(title)
+    fig.suptitle(title, fontsize=20)
     for loss_i, loss_type in enumerate([LossType.TELE, LossType.DEON]):
         data = [[round_dict[label] for round_dict in
                  count_dict[loss_type.value]] for label in agent_label_arr]
@@ -238,10 +238,10 @@ def main():
 
 
 if __name__ == "__main__":
-    # main()
-    # for n in [2, 5, 15, 20, 50, 100]:
-    #     homo_exp(n)
-    # for n in [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]:
-    #     mix_exp(n)
+    main()
+    for n in [2, 5, 15, 20, 50, 100]:
+        homo_exp(n)
+    for n in [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]:
+        mix_exp(n)
     for n in [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]:
         mix_comp_exp(n=n, num_round=10, num_sim=100, ratio=0.2)
